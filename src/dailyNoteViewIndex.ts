@@ -101,10 +101,23 @@ export default class DailyNoteViewPlugin extends Plugin {
         document.body.toggleClass("daily-notes-hide-backlinks", false);
     }
 
+
     async openDailyNoteEditor() {
         const workspace = this.app.workspace;
-        const leaf = workspace.getLeaf(true);
-        await leaf.setViewState({ type: DAILY_NOTE_VIEW_TYPE });
+        const leaves = workspace.getLeavesOfType(DAILY_NOTE_VIEW_TYPE);
+        let leaf;
+
+        if (leaves.length > 0) {
+            leaf = leaves[0];
+            const viewState = leaf.getViewState()
+            if (!viewState.active) {
+                workspace.setActiveLeaf(leaf, { focus: true })
+            }
+        } else {
+            leaf = workspace.getLeaf(true);
+            await leaf.setViewState({ type: DAILY_NOTE_VIEW_TYPE });
+        }
+
         workspace.revealLeaf(leaf);
     }
 
